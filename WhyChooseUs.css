@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Bree+Serif&family=Caveat:wght@400;700&family=Lobster&family=Monoton&family=Open+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Playfair+Display+SC:ital,wght@0,400;0,700;1,700&family=Playfair+Display:ital,wght@0,400;0,700;1,700&family=Roboto:ital,wght@0,400;0,700;1,400;1,700&family=Source+Sans+Pro:ital,wght@0,400;0,700;1,700&family=Work+Sans:ital,wght@0,400;0,700;1,700&display=swap');
+
+.Ecommerce-Website-Services-Section-bg {
+    
+    font-family: "Roboto";
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+.Ecommerce-Website-Services-Section-h1 {
+    color: #183b56;
+    font-size: 41px;
+    font-weight: 700;
+}
+
+.Ecommerce-Website-Services-Section-p1 {
+    color: #616c7c;
+    font-size: 21px;
+    font-weight: 500;
+}
+
+.Ecommerce-Website-Services-Section-card {
+    text-align: center;
+    margin: 10px;
+    padding: 20px;
+}
+
+.Ecommerce-Website-Services-Section-img {
+    height: 95px;
+}
+
+.Ecommerce-Website-Services-Section-h2 {
+    font-size: 25px;
+}
+
+.Ecommerce-Website-Services-Section-p2 {
+    font-size: 17px;
+    color: #7b8794;
+}

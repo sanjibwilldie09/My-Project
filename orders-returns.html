@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-shop Orders & Returns</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f9f9;
+        }
+        .orders-returns-section-bg {
+            background-color: #fff;
+            padding: 4rem 0;
+            margin-top: 5rem;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+        .orders-returns-header {
+            font-size: 36px;
+            font-weight: bold;
+            color: #343a40;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .orders-table {
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+        .orders-table th,
+        .orders-table td {
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        .orders-table th {
+            background-color: #f8f9fa;
+            font-size: 18px;
+        }
+        .orders-table td {
+            font-size: 16px;
+        }
+        .action-btn {
+            background-color: #e53946;
+            color: white;
+            padding: 0.5rem 1.2rem;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .action-btn:hover {
+            background-color: #c13536;
+        }
+        .modal-header,
+        .modal-body {
+            background-color: #f8f9fa;
+        }
+        .modal-footer {
+            text-align: center;
+        }
+        @media (max-width: 768px) {
+            .orders-returns-header {
+                font-size: 28px;
+            }
+            .orders-table td,
+            .orders-table th {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="orders-returns-section-bg">
+            <h1 class="orders-returns-header">Your Orders & Returns</h1>
+            <!-- Orders Table -->
+            <table class="table orders-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Products</th>
+                        <th>Date Ordered</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-body">
+                    <!-- Orders will be dynamically inserted here -->
+                </tbody>
+            </table>
+        </div>
+        <!-- Order Details Modal -->
+        <div class="modal fade" id="orderDetailsModal" tabindex="-1" role="dialog" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="orderDetailsModalLabel">Order Details</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" id="order-details-content">
+                        <!-- Details will be loaded here -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br><br>
+        <div style="text-align: right;">
+            <button class="btn btn-danger" type="button" onclick="clearOrderHistory()">Clear History</button>
+            <button class="btn btn-primary" type="button" onclick="goback()">Go Back</button>
+        </div>
+    </div>
+
+    <script>
+        function goback() {
+            window.location.href = "index.html";
+        }
+
+        // Fetch orders from backend and populate table
+        let ordersData = [];
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('http://localhost:8080/api/orders')
+                .then(response => response.json())
+                .then(orders => {
+                    ordersData = orders;
+                    const tbody = document.getElementById('orders-body');
+                    tbody.innerHTML = '';
+                    if (orders.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" class="text-muted">No orders found.</td></tr>';
+                        return;
+                    }
+                    orders.forEach((order, idx) => {
+                        let products = order.items.map(item => item.productName + ' x' + item.quantity).join('<br>');
+                        let status = '<span class="badge badge-success">Delivered</span>'; // You can adjust logic here
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${idx + 1}</td>
+                                <td>${products}</td>
+                                <td>${order.date || '-'}</td>
+                                <td>${status}</td>
+                                <td>
+                                    <button class="action-btn" onclick="showOrderDetails(${idx})" data-toggle="modal" data-target="#orderDetailsModal">View Details</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                });
+        });
+
+        function showOrderDetails(orderIdx) {
+            const order = ordersData[orderIdx];
+            let details = `<h6><strong>Products:</strong></h6>`;
+            order.items.forEach(item => {
+                details += `<p>${item.productName} x${item.quantity}</p>`;
+            });
+            details += `<p><strong>Order Date:</strong> ${order.date || '-'}</p>`;
+            document.getElementById('order-details-content').innerHTML = details;
+        }
+
+        function clearOrderHistory() {
+            if (!confirm("Are you sure you want to clear all order history? This cannot be undone.")) return;
+            fetch('http://localhost:8080/api/orders', {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert("Order history cleared!");
+                    location.reload();
+                } else {
+                    alert("Failed to clear order history.");
+                }
+            })
+            .catch(() => alert("Failed to clear order history."));
+        }
+    </script>
+    <!-- Bootstrap JS (for modals) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" crossorigin="anonymous"></script>
+</body>
+</html>
